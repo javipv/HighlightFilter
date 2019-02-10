@@ -29,25 +29,35 @@ Highilight abbreviations help. Very handy if you don't want to type the (long) f
 :hih 
 ```
 
+
 Highlight help on color names:
+Show the basic color highlight IDs.
+```
+:hiid
+```
+
+Show all color highlight names, shows plain, bold, underlined and background color names:
 ```
 :hicol all
 ```
 
-```
-:hicol
-```
-
+Show red colors' names.
 ```
 :hicol red
 ```
 
+Show green colors' names.
 ```
 :hicol red green
 ```
 
 Highlight help on color IDs:
-Show all color IDs
+Show the basic color highlight IDs.
+```
+:hiid
+```
+
+Show all color highlight IDs shows plain, bold, underlined and background color IDs:
 ```
 :hiid all
 ```
@@ -212,6 +222,7 @@ Omitt confirmation and automatically save highlight config.
 Omitt confirmation and do not automatically save highlight config.
 ```
 :let g:HighlightFilter_AutoSaveExcludeExt= "cpp h sh c vim xml"
+```
 ```
 :let g:HighlightFilter_AutosaveFiles =  ".highlightFilter.vim /home/MY_USER/.highlightFilter.vim"
 ```
