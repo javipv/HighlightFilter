@@ -9,7 +9,7 @@ let g:HighlightFilter_AutoSaveExtensions = "log txt"
 
 " Omitt confirmation and do not automatically save highlight config.
 let g:HighlightFilter_AutoSaveExcludeExt= "cpp h sh c vim xml"
-let g:HighlightFilter_AutosaveFiles =  ".highlightFilter.vim /home/trenc/.highlightFilter.vim"
+let g:HighlightFilter_AutosaveFiles =  ".highlightFilter.vim /home/MY_USER/.highlightFilter.vim"
 
 " Use ag or grep to show highlight filter split.
 let g:HighlightFilter_ExternalFilter = 1
