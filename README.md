@@ -4,6 +4,8 @@ Highlight text patterns in different colors.
 Save, reload and modify the highlighting configuration.
 Filter by color the lines and show then on a new split/tab.
 
+<img src="https://raw.githubusercontent.com/javipv/HighlightFilter.vim/master/screenshot.png">
+
 ## Install
 
 ```
@@ -11,7 +13,7 @@ Pathogen:
 ```
 
 ```
-git clone https://github.com/jaxbot/semantic-highlight.vim.git
+git clone https://github.com/javipv/HighlightFilter.vim.git
 ```
 
 
