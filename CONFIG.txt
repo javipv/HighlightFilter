@@ -1,0 +1,24 @@
+"=======================================================================
+" My .vimrc configuration for highlightFilter.vim
+"=======================================================================
+" Save highlight configurations on this paths:
+let g:HighlightFilter_SourceFiles = ".highlightFilter.vim /home/MY_USER/.highlightFilter.vim"
+
+" Omitt confirmation and automatically save highlight config.
+let g:HighlightFilter_AutoSaveExtensions = "log txt"
+
+" Omitt confirmation and do not automatically save highlight config.
+let g:HighlightFilter_AutoSaveExcludeExt= "cpp h sh c vim xml"
+let g:HighlightFilter_AutosaveFiles =  ".highlightFilter.vim /home/trenc/.highlightFilter.vim"
+
+" Use ag or grep to show highlight filter split.
+let g:HighlightFilter_ExternalFilter = 1
+
+" Autofilter configuration active:
+let g:HighlightFilter_AutoFilt = 1
+
+" On this file types. Do not open filter split automatically.
+let g:HighlightFilter_AutoFiltNotExtensions = "cpp hpp h c"
+
+" On this file types. Open automatically the highlight filter split. 
+let g:HighlightFilter_AutoFiltExtensions    = "log txt"
