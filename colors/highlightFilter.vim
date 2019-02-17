@@ -1,5 +1,6 @@
-" Script Name: highlightFilter.vim
- "Description: Color configuration for highlightFilter plugin.
+" Script Name: highlightMatch.vim
+ "Description: Highlight patterns in different colors. 
+ "Allows to save, reload and modify the highlighting configuration.
 "
 " Copyright:   (C) 2017-2019 Javier Puigdevall Garcia
 "   The VIM LICENSE applies to this script; see ':help copyright'.
@@ -9,11 +10,11 @@
 "
 " Dependencies:
 "
-" NOTES:
-"
-" Version:      1.0.0
+" Version:      1.0.1
 " Changes:
-
+" 1.0.1 	Tue, 12 Feb 19.     JPuigdevall
+" 1.0.0 	Sun, 10 Feb 17.     JPuigdevall
+"   - Initial realease.
 
 if has("gui_running")
     echom "HighlightMatch Gui config"

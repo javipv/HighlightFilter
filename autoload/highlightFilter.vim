@@ -1,5 +1,5 @@
 " Script Name: highlightFilter.vim
-" Description: Highlight text patterns in different colors. 
+" Description: Highlight text patterns in different colors.
 "   Allows to save, reload and modify the highlighting configuration.
 "   Allows to filter by color the lines and show then on a new split/tab.
 "
@@ -11,20 +11,23 @@
 "
 " Dependencies:
 "
-" NOTES:
-
 " INSPIRED BY:
 "   https://github.com/vim-scripts/Mark--Karkat
 "   http://github.com/guns/highlight.vim
 "
-" Version:      1.0.0
+" Version:      1.0.1
 " Changes:
+" 1.0.1 	Tue, 12 Feb 19.     JPuigdevall
+"   - Fix remving serveral patterns on rmPatterms function, using wrong index when 
+"   	removing several patterns.
+" 1.0.0 	Sun, 10 Feb 17.     JPuigdevall
+"   - Initial realease.
 
 
 "- functions -------------------------------------------------------------------
 
 function! s:Error(mssg)
-    echohl ErrorMsg | echom s:pluginName.": ".a:mssg | echohl None
+    echohl ErrorMsg | echom "[".s:plugin."] ".a:mssg | echohl None
 endfunction
 
 
@@ -36,7 +39,7 @@ endfunction
 " Debug function. Log message
 function! s:Verbose(level,func,mssg)
     if s:verbose >= a:level
-        echom s:plugin_name." : ".a:func." : ".a:mssg
+        echom "[".s:plugin_name." : ".a:func."] ".a:mssg
     endif
 endfunction
 
@@ -44,7 +47,7 @@ endfunction
 " Debug function. Log message and wait user key
 function! s:VerboseStop(level,func,mssg)
     if s:verbose >= a:level
-        call input(s:plugin_name." : ".a:func." : ".a:mssg." (press key)")
+        call input("[".s:plugin_name." : ".a:func."] ".a:mssg." (press key)")
     endif
 endfunction
 
@@ -122,7 +125,7 @@ fun! s:ReloadColorConfig()
 endfun
 
 
-" Reload highlight predefined types from config files 
+" Reload highlight predefined types from config files
 function! s:ReloadTypeConfig()
     let w:HighlightFilter_TypesList = []
     let file  = expand('%:h')."/"
@@ -178,7 +181,7 @@ function! s:SyntaxClear()
 endfunction
 
 
-" Reload the syntax highliting   
+" Reload the syntax highliting
 function! s:SyntaxReload()
     call s:SyntaxClear()
 
@@ -386,7 +389,7 @@ function! s:HighlightFilter_ColorReload(color,pattern,opt)
 endfunction
 
 
-" Remove config with selected name 
+" Remove config with selected name
 function! s:RemoveConfig(name,file)
     call s:Verbose(1,"RemoveConfig","file: ".a:file." config:".a:name)
 
@@ -454,7 +457,7 @@ function! s:RemoveConfigAll(name)
 endfunction
 
 
-" 
+"
 function! s:SaveColorHiglighting(file,name)
     if !exists("w:ColoredPatternsList") || len(w:ColoredPatternsList) <= 0
         call s:Warn("Color highglight not found, empty.")
@@ -582,7 +585,7 @@ function! s:GetColorPatterns(colors,separator,confirmation)
 
     if !exists("w:ColoredPatternsList") || len(w:ColoredPatternsList) <= 0
         call s:Warn("Color highglight not found, empty.")
-        return 
+        return
     endif
 
     let showColorList = []
@@ -603,7 +606,7 @@ function! s:GetColorPatterns(colors,separator,confirmation)
 
             if a:colors != ""
                 let showFlag = 0
-                for showColor in l:showColorList 
+                for showColor in l:showColorList
                     if l:color == l:showColor
                         let showFlag = 1
                         break
@@ -639,7 +642,7 @@ endfunction
 function! s:GetColorRegionPatterns(colors)
     if !exists("w:ColoredPatternsList") || len(w:ColoredPatternsList) <= 0
         call s:Warn("Color highglight not found, empty.")
-        return 
+        return
     endif
 
     let showColorList = []
@@ -660,7 +663,7 @@ function! s:GetColorRegionPatterns(colors)
 
         if a:colors != ""
             let showFlag = 0
-            for showColor in l:showColorList 
+            for showColor in l:showColorList
                 if l:color == l:showColor
                     let showFlag = 1
                     break
@@ -822,7 +825,7 @@ function! highlightFilter#SaveCurrentHighlightCfg(name)
             "endif
         "endfor
         "call input("File number: ")
-        "if 
+        "if
             "let file = l:i
         "else
             "for i in l:list
@@ -845,7 +848,7 @@ function! highlightFilter#SaveCurrentHighlightCfg(name)
 endfunction
 
 
-" Show the color configuration 
+" Show the color configuration
 function! s:ShowHighlightCfg(cfgList)
     echo "Pos) Color Opt  Highlight_pattern"
     echo "---------------------------------"
@@ -908,8 +911,24 @@ function! highlightFilter#RmPattern()
     if l:n == "" | return 1 | endif
 
     " Remove from the highlighted colors/patterns list
+    " First remove content on elment 0 of the list
+    " Afterwards remove all list elements with empty position 0.
+    " This fixes removing several positions at the same time.
     for i in split(l:n,' ')
-        call remove(w:ColoredPatternsList, l:i, l:i)
+        let w:ColoredPatternsList[l:i][0] = ""
+    endfor
+
+    echo " "
+    echo " "
+
+    let i = 0
+    for pattern in w:ColoredPatternsList
+        if l:pattern[0] == ""
+            echo "Remove position ".l:i.": ".l:pattern[1]
+            call remove(w:ColoredPatternsList, l:i, l:i)
+        else
+            let i += 1
+        endif
     endfor
 
     call s:SyntaxReload()
@@ -917,7 +936,6 @@ function! highlightFilter#RmPattern()
     call s:AutoSaveColorHiglighting()
     call s:AutoSyncFiltWindowData()
     redraw
-    "call highlightFilter#RmPattern()
 endfunction
 
 
@@ -1016,7 +1034,7 @@ endfunction
 " Highlight match pattern with selected color
 function! highlightFilter#PatternColorize(...)
     if a:0 < 1
-        call s:Error("Args: pattern colorId")
+        call s:Error("Args: pattern [colorId]")
         return
     endif
 
@@ -1033,7 +1051,7 @@ function! highlightFilter#PatternColorize(...)
         echo " "
     endif
 
-    " 
+    "
     let pattern = a:1
     let n = 2
     while l:n < a:0
@@ -1113,7 +1131,7 @@ function! highlightFilter#PatternColorHelp(...)
 endfunction
 
 
-" Show all available configuration types 
+" Show all available configuration types
 function! highlightFilter#ShowConfigType(type)
     call s:ReloadTypeConfig()
 
@@ -1121,12 +1139,12 @@ function! highlightFilter#ShowConfigType(type)
         " Open menu on screen to choose the config type
         let l:type = s:TypeMenuSelect()
         if l:type <= 0 | return | endif
-    else 
+    else
         let l:type = a:type
     endif
 
     " Check if first letter is numeric value
-    if "0123456789" !~ l:type[0:0] 
+    if "0123456789" !~ l:type[0:0]
         " type is function name
         let configName = a:type
     else
@@ -1183,7 +1201,7 @@ function! highlightFilter#ShowConfigType(type)
 endfunction
 
 
-" 
+"
 function! highlightFilter#LoadConfigTypeFilter(type)
     call highlightFilter#LoadConfigType(a:type)
     call highlightFilter#ColorFilter(g:HighlightFilter_FilterSplit, "")
@@ -1209,7 +1227,7 @@ function! highlightFilter#LoadConfigType(type)
         echo printf("%' '3d)  %s","0","Clear all")
         let l:types = s:TypeMenuSelect()
         if  l:types < 0 | return | endif
-    else 
+    else
         let l:types = a:type
     endif
 
@@ -1221,7 +1239,7 @@ function! highlightFilter#LoadConfigType(type)
     let typeList = split(l:types,' ')
     for type in l:typeList
         " Check if first letter is numeric value
-        if "0123456789" !~ l:type[0:0] 
+        if "0123456789" !~ l:type[0:0]
             if l:type ==? "clear"
                 echo "Clear highlighting"
                 call s:SyntaxClear()
@@ -1312,7 +1330,7 @@ function! highlightFilter#LoadConfigType(type)
 endfunction
 
 
-" Load last configuration used 
+" Load last configuration used
 function! highlightFilter#LastType()
     if exists('w:LastConfigType') && w:LastConfigType != ""
         call s:Warn("No previous config found.")
@@ -1338,7 +1356,7 @@ function! highlightFilter#TypeShow()
         call s:Warn("Highlight predifined configuration not found.")
         return
     endif
-    
+
     let n = 1 | let i = 0
     while l:i < len(w:HighlightFilter_TypesList)
         echo " ".l:n.") ".w:HighlightFilter_TypesList[l:i]
@@ -1353,7 +1371,7 @@ function! highlightFilter#TypeShow()
 endfunction
 
 
-" Search all patterns with the selected color names 
+" Search all patterns with the selected color names
 " Arg1: space separated color names: m y c rb
 function! highlightFilter#ColorSearch(confirm,colors)
     let separator = "###"
@@ -1371,7 +1389,7 @@ function! highlightFilter#ColorSearch(confirm,colors)
          call confirm("Continue")
     endif
 
-    setlocal nohlsearch 
+    setlocal nohlsearch
     silent exec("normal /".l:patterns)
     let @/ = l:patterns
     normal n
@@ -1386,7 +1404,7 @@ function! s:CheckBuffFileExist(filename)
         if bufname(b) == a:filename
             return 1
         endif
-        if filereadable(a:filename) 
+        if filereadable(a:filename)
             return 1
         endif
     endfor
@@ -1430,7 +1448,7 @@ function! s:BasicFilter(split,rename,patterns)
 
     put! a
     return 0
-endfunc 
+endfunc
 
 
 " Filter lines containing patterns with external tool (ag/grep).
@@ -1445,7 +1463,7 @@ function! s:AgGrepFilter(split,rename,patterns)
     let res = 0
 
     " Check file exist or file is compressed
-    if empty(glob(l:file)) || l:ext == "gz" || l:ext == "Z" || l:ext == "bz2" 
+    if empty(glob(l:file)) || l:ext == "gz" || l:ext == "Z" || l:ext == "bz2"
         " Buffer not saved on file
         " save a temporary copy
         let file = tempname()
@@ -1491,7 +1509,7 @@ function! s:AgGrepFilter(split,rename,patterns)
     if l:fileDelete != "" | call delete(l:fileDelete) | endif
 
     return l:res
-endfunction 
+endfunction
 
 
 " Filter lines containing patterns and regions with external tool (awk).
@@ -1508,7 +1526,7 @@ function! s:AwkFilter(split,rename, regionList, patterns)
     let res = 0
 
     " Check file exist or file is compressed
-    if empty(glob(l:file)) || l:ext == "gz" || l:ext == "Z" || l:ext == "bz2" 
+    if empty(glob(l:file)) || l:ext == "gz" || l:ext == "Z" || l:ext == "bz2"
         " Buffer not saved on file
         " save a temporary copy
         let file = tempname()
@@ -1605,7 +1623,7 @@ function! s:AwkFilter(split,rename, regionList, patterns)
     if l:fileDelete != "" | call delete(l:fileDelete) | endif
 
     return l:res
-endfunction 
+endfunction
 
 
 " Conceal any ANSI Escape sequence characters
@@ -1619,12 +1637,12 @@ function! s:ConcealEscSeq()
         set concealcursor=vnc
         set nocursorline
     endif
-endfunction 
+endfunction
 
 
 " Show all highilight patterns on current window
 function! highlightFilter#ShowPatterns()
-    if exists('w:FiltWinSyncList') 
+    if exists('w:FiltWinSyncList')
         if w:FiltWinSyncList[0] == "filt"
             " Currrent window is a filter window, get patterns from the filter's list of
             " saved configurations
@@ -1633,7 +1651,7 @@ function! highlightFilter#ShowPatterns()
         endif
     endif
 
-    if !exists('l:patterns') 
+    if !exists('l:patterns')
         echo "Highlighted patterns: "
         let patterns = s:GetColorPatterns("","\n   ","")
     endif
@@ -1646,7 +1664,7 @@ function! highlightFilter#ShowPatterns()
 endfunction
 
 
-" Filter all linew matching patterns with the selected color names 
+" Filter all linew matching patterns with the selected color names
 " Arg1: space separated color names: m y c rb
 function! highlightFilter#ColorFilter(split,colors)
     let w:HighlightFilter_FiltColors = a:colors
@@ -1686,8 +1704,8 @@ function! highlightFilter#ColorFilter(split,colors)
         let rename = s:GetFiltFileName(l:path,l:name,l:ext)
     endif
 
-    let baseWinNr = win_getid()
-    let winName = expand('%')
+    let l:baseWinNr = win_getid()
+    let l:winName = expand('%')
 
     if len(l:regionsList) != 0 && g:HighlightFilter_AwkFilter != 0
         if s:AwkFilter(a:split,l:rename,l:regionsList,l:patterns) != 0
@@ -1791,7 +1809,7 @@ function! highlightFilter#ColorHelp(filter)
         if l:filters != ""
             let found = 0
             for tmp in split(l:filters,' ')
-                if matchstr(l:colorList[4], l:tmp) != "" 
+                if matchstr(l:colorList[4], l:tmp) != ""
                     let found = 1
                     break
                 endif
@@ -1905,7 +1923,7 @@ function! highlightFilter#ColorIdHelp(filter)
         if l:filters != ""
             let found = 0
             for tmp in split(l:filters,' ')
-                if matchstr(l:colorList[0], l:tmp) != "" 
+                if matchstr(l:colorList[0], l:tmp) != ""
                     let found = 1
                     break
                 endif
@@ -2032,7 +2050,7 @@ function! highlightFilter#OpenConfig()
 endfunction
 
 
- "On new file opened, load last color highlighting 
+ "On new file opened, load last color highlighting
 function! s:AutoLoadColorHiglighting()
     if g:HighlightFilter_Autoload != 1 | return | endif
 
@@ -2073,7 +2091,7 @@ endfunction
 "autocmd! BufWinEnter *  :call s:AutoLoadColorHiglighting()
 
 
-" Choose folding level on current line 
+" Choose folding level on current line
 function! s:MarkdownFolds(foldexpr)
     if a:foldexpr == ""
         return 0
@@ -2082,7 +2100,7 @@ function! s:MarkdownFolds(foldexpr)
     if matchstr( getline(v:lnum), a:foldexpr ) != ""
         return 0
     else
-       if matchstr( getline(v:lnum-1), a:foldexpr) != "" || matchstr( getline(v:lnum+1), a:foldexpr) != "" 
+       if matchstr( getline(v:lnum-1), a:foldexpr) != "" || matchstr( getline(v:lnum+1), a:foldexpr) != ""
            return 1
        else
           return 2
@@ -2091,7 +2109,7 @@ function! s:MarkdownFolds(foldexpr)
 endfunction
 
 
-" Fold file using patterns from the selected colors 
+" Fold file using patterns from the selected colors
 function! highlightFilter#HighlightFoldColors(colors)
     let separator = "###"
 
@@ -2113,17 +2131,17 @@ function! highlightFilter#HighlightFoldColors(colors)
     setlocal foldexpr=s:MarkdownFolds(w:foldexpr)
 
     " Set fold colors
-    hi Folded term=NONE cterm=NONE gui=NONE ctermbg=DarkGrey 
+    hi Folded term=NONE cterm=NONE gui=NONE ctermbg=DarkGrey
 
     " Remove fold padding charactesr -----
     setlocal fillchars="vert:|,fold: "
     setlocal foldtext="..."
-    setlocal foldlevel=0 
+    setlocal foldlevel=0
     setlocal foldcolumn=0
 endfunction
 
 
-" Fold file using selected patterns 
+" Fold file using selected patterns
 function! highlightFilter#HighlightFoldPatterns(patterns)
     if a:patterns == ""
         let separator = "###"
@@ -2150,17 +2168,17 @@ function! highlightFilter#HighlightFoldPatterns(patterns)
     setlocal foldexpr=s:MarkdownFolds(w:foldexpr)
 
     " Set fold colors
-    hi Folded term=NONE cterm=NONE gui=NONE ctermbg=DarkGrey 
+    hi Folded term=NONE cterm=NONE gui=NONE ctermbg=DarkGrey
 
     " Remove fold padding charactesr -----
     setlocal fillchars="vert:|,fold: "
     setlocal foldtext="..."
-    setlocal foldlevel=0 
+    setlocal foldlevel=0
     setlocal foldcolumn=0
 endfunction
 
 
-" Show patterns used for folding. 
+" Show patterns used for folding.
 function! highlightFilter#HighlightShowFoldExpr()
     if !exists('w:foldexpr')
         call s:Warn("Fold patterns not found.")
@@ -2198,9 +2216,9 @@ function! highlightFilter#ForceAutoSaveColorHiglighting()
 endfunction
 
 
-" Configure data syncronization between main and filter window. 
+" Configure data syncronization between main and filter window.
 function! highlightFilter#AutoSyncFiltWindowPosCfg(state)
-    if !exists('w:FiltWinSyncList') 
+    if !exists('w:FiltWinSyncList')
         call s:Warn("Window synchronization not active.")
         return
     endif
@@ -2230,11 +2248,11 @@ function! highlightFilter#AutoSyncFiltWindowPosCfg(state)
 endfunction
 
 
-" Syncronize position between original file and filter window 
-" Note: experimental function it may not work if exist several 
+" Syncronize position between original file and filter window
+" Note: experimental function it may not work if exist several
 " identical lines on both buffers.
 function! highlightFilter#SyncSwitchWindowPosition(...)
-    if !exists('w:FiltWinSyncList') 
+    if !exists('w:FiltWinSyncList')
         call s:Warn("Window synchronization not active.")
         return
     endif
@@ -2284,21 +2302,21 @@ function! highlightFilter#SyncSwitchWindowPosition(...)
 endfunction
 
 
-" Syncronize position between original file and filter window 
+" Syncronize position between original file and filter window
 " Leave cursor on the complementary window, if currently on filter
 " window leave cursor on main window.
-" Note: experimental function it may not work if exist several 
+" Note: experimental function it may not work if exist several
 " identical lines on both buffers.
 function! highlightFilter#SyncWindowPosition(...)
-    if !exists('w:FiltWinSyncList') 
+    if !exists('w:FiltWinSyncList')
         call s:Warn("Window synchronization not active.")
         return
     endif
 
     let winNr1 = win_getid()
 
-    if a:0 >= 1 
-        let tmp=a:1 
+    if a:0 >= 1
+        let tmp=a:1
     else
         let tmp=""
     endif
@@ -2311,7 +2329,7 @@ endfunction
 " Handle movement events on filter or main window.
 " Perform window position synchronization if configuration enabled
 function! s:AutoSyncFiltWindowPosition()
-    if !exists('w:FiltWinSyncList') 
+    if !exists('w:FiltWinSyncList')
         return
     endif
     if w:FiltWinSyncList[4] == 1
@@ -2320,9 +2338,9 @@ function! s:AutoSyncFiltWindowPosition()
 endfunction
 
 
-" Configure data syncronization between main and filter window. 
+" Configure data syncronization between main and filter window.
 function! highlightFilter#AutoSyncFiltWindowDataCfg(state)
-    if !exists('w:FiltWinSyncList') 
+    if !exists('w:FiltWinSyncList')
         call s:Warn("Window synchronization not active.")
         return
     endif
@@ -2352,9 +2370,9 @@ function! highlightFilter#AutoSyncFiltWindowDataCfg(state)
 endfunction
 
 
-" Synchronize data of filter window with main window 
+" Synchronize data of filter window with main window
 function! highlightFilter#SyncFiltWindowData(...)
-    if !exists('w:FiltWinSyncList') 
+    if !exists('w:FiltWinSyncList')
         call s:Warn("Window synchronization not active.")
         return
     endif
@@ -2427,10 +2445,10 @@ function! highlightFilter#SyncFiltWindowData(...)
 endfunction
 
 
-" Update main window content, and synchronize filter split window if exists. 
+" Update main window content, and synchronize filter split window if exists.
 function! highlightFilter#Update()
 
-    if !exists('w:FiltWinSyncList') 
+    if !exists('w:FiltWinSyncList')
         " Update main window
         edit!
         return
@@ -2538,7 +2556,7 @@ function! s:AutoSyncFiltWindowData()
             endif
         endif
     endif
-    if exists('w:FiltWinSyncList') 
+    if exists('w:FiltWinSyncList')
         if w:FiltWinSyncList[5] == 1
             call highlightFilter#SyncFiltWindowData("")
         endif
@@ -2549,7 +2567,7 @@ endfunction
 " Synchronize filter and main window
 " On any change synchronize both: position and data.
 function! highlightFilter#AutoSyncFiltWindowCfg()
-    if !exists('w:FiltWinSyncList') 
+    if !exists('w:FiltWinSyncList')
         call s:Warn("Window synchronization not active.")
         return
     endif
@@ -2559,13 +2577,13 @@ endfunction
 
 
 function! highlightFilter#SyncFiltWindowCfg(...)
-    if !exists('w:FiltWinSyncList') 
+    if !exists('w:FiltWinSyncList')
         call s:Warn("Window synchronization not active.")
         return
     endif
 
-    if a:0 >= 1 
-        let tmp=a:1 
+    if a:0 >= 1
+        let tmp=a:1
     else
         let tmp=""
     endif
@@ -2581,7 +2599,7 @@ function! highlightFilter#SyncFiltWindowCfg(...)
 endfunction
 
 
-" Refresh highlighting 
+" Refresh highlighting
 function! highlightFilter#Refresh()
     " Refresh current window highlight
     call s:ReloadColorConfig()
@@ -2620,7 +2638,7 @@ function! highlightFilter#HighlightWord()
 endfunction
 
 
-function! highlightFilter#HighlightWholeWord()                                                         
+function! highlightFilter#HighlightWholeWord()
     call highlightFilter#PatternColorize(escape(expand('<cword>'),' \'))
 endfunction
 
@@ -2631,121 +2649,65 @@ endfunction
 
 
 function! highlightFilter#Help()
-    echo "highlightFiler.vim abbreviations' help:"
-    echo "--------------------------------------------------------------------- "
-    echo " Hihglight types          : "
-    echo "   Load                   : "
-    echo "    hit  [TYPE_NAME]      : apply selected highlight"
-    echo "    hitf [TYPE_NAME]      : apply selected highlight, open filter split"
-    echo "   Save                   : "
-    echo "    hicfg                 : open all highlight configuration files"
-    echo "    hisv [TYPE_NAME]      : save current highlight configuration"
-    echo "    hifsv [TYPE_NAME]     : force save current highlight configuration"
+    echo "highlightFiler.vim"
+    echo "  "
+    echo "Abbreviations help:"
+    "echo "--------------------------------------------------------------------- "
+    echo "  Hihglight types          : "
+    echo "    Load                   : "
+    echo "     hit  [TYPE_NAME]      : apply selected highlight"
+    echo "     hitf [TYPE_NAME]      : apply selected highlight, open filter split"
+    echo "    Save                   : "
+    echo "     hicfg                 : open all highlight configuration files"
+    echo "     hisv [TYPE_NAME]      : save current highlight configuration"
+    echo "     hifsv [TYPE_NAME]     : force save current highlight configuration"
+    echo "  "
+    echo "  Color help               : "
+    echo "     hicol [all/COLOR]     : show highlighting color names"
+    echo "     hiid  [all/COLOR_ID]  : show highlighting color IDs"
+    echo "  "
+    echo "  Highlight commands       : "
+    echo "     hic PATTERN  COLOR_ID : apply color highlight"
+    echo "     hirm                  : open selection menu to remove a highlight pattern"
+    echo "     hiu                   : undo last highlight"
+    echo "     hish                  : show highlight applied on current file"
+    echo "     hishp                 : show highlight patterns"
+    echo "     hicrm [COLOR_ID]      : remove all pattern highlighted with COLOR_ID. Remove all if no argument provided"
+    echo "     hics [COLOR_ID]       : search all patterns highlighted with COLOR_ID. Search all if no argument provided"
+    echo "  "
+    echo "  Folding                  : "
+    echo "     hifold [COLOR_ID]     : perform fold, show only lines with highlighting"
+    echo "     hifoldsh              : show folding patterns"
+    echo "  "
+    echo "  Filter window            : "
+    echo "     hif                   : open all lines containing any highlights on a new split"
+    echo "     hifs                  : open all lines containing any highlights on a new horizontal split"
+    echo "     hifv                  : open all lines containing any highlights on a new vertical split"
+    echo "     hift                  : open all lines containing any highlights on a new tab"
+    echo "     hifn                  : open all lines containing any highlights on a new buffer"
+    echo "     hisy                  : synchronize filter window data and position"
+    echo "   Filter window position  : "
+    echo "     hip                   : synchcronize position"
+    echo "     hips                  : synchonize position and switch window"
+    echo "     hipsa                 : enable position auto synchonize"
+    echo "     hipsn                 : disable position auto synchonize"
+    echo "   Filter window data      : "
+    echo "     hids                  : sychcronize data changes"
+    echo "     hidsa                 : enable data change auto synchonize"
+    echo "     hidsn                 : disable data changes auto synchonize"
+    echo "  "
+    echo "     Hiup                  : update main and filtered buffer contents"
+    echo "  "
+    echo "  Others"
+    echo "     hir                   : refresh all highlightings"
+    echo "  "
+    echo "Base colors help:"
+    echo "  ".g:HighlightFilter_BaseColors
     echo " "
-    echo " Color help               : "
-    echo "    hicol [all/color]     : show highlighting color names"
-    echo "    hiid  [all/color_id]  : show highlighting color IDs"
+    echo "Color IDs help:"
+    echo "  ".g:HighlightFilter_ColorIds
     echo " "
-    echo " Highlight commands       : "
-    echo "    hic PATTERN  COLOR_ID : apply color highlight"
-    echo "    hirm                  : remove all highlights"
-    echo "    hiu                   : undo last highlight"
-    echo "    hish                  : show highlight applied on current file"
-    echo "    hishp                 : show highlight patterns"
-    echo "    hicrm [COLOR_ID]      : highlight color remove"
-    echo "    hics [COLOR_ID]       : highlight color search"
-    echo " "
-    echo " Folding                  : "
-    echo "    hifold [COLOR_ID]     : perform fold, show only lines with highlighting"
-    echo "    hifoldsh              : show folding patterns"
-    echo " "
-    echo " Filter window            : "
-    echo "    hif                   : open all lines containing any highlights on a new split"
-    echo "    hifs                  : open all lines containing any highlights on a new horizontal split"
-    echo "    hifv                  : open all lines containing any highlights on a new vertical split"
-    echo "    hift                  : open all lines containing any highlights on a new tab"
-    echo "    hifn                  : open all lines containing any highlights on a new buffer"
-    echo "    hisy                  : synchronize filter window data and position"
-    echo "  Filter position         : "
-    echo "    hip                   : synchcronize position"
-    echo "    hips                  : synchonize position and switch window"
-    echo "    hipsa                 : enable position auto synchonize"
-    echo "    hipsn                 : disable position auto synchonize"
-    echo "  Filter data             : "
-    echo "    hids                  : sychcronize data changes"
-    echo "    hidsa                 : enable data change auto synchonize"
-    echo "    hidsn                 : disable data changes auto synchonize"
-    echo " "
-    echo "    Hiup                  : update main and filtered buffer contents"
-    echo " "
-    echo " Others"
-    echo "    hir                   : refresh all highlightings"
-    echo " "
-
-    "let helpList = []
-    "let helpList += [  "highlightFiler.vim abbreviations' help:" ]
-    "let helpList += [  "--------------------------------------------------------------------- " ]
-    "let helpList += [  " Hihglight types          : " ]
-    "let helpList += [  "   Load                   : " ]
-    "let helpList += [  "    hit  [TYPE_NAME]      : apply selected highlight" ]
-    "let helpList += [  "    hitf [TYPE_NAME]      : apply selected highlight, open filter split" ]
-    "let helpList += [  "   Save                   : " ]
-    "let helpList += [  "    hicfg                 : open all highlight configuration files" ]
-    "let helpList += [  "    hisv [TYPE_NAME]      : save current highlight configuration" ]
-    "let helpList += [  "    hifsv [TYPE_NAME]     : force save current highlight configuration" ]
-    "let helpList += [  " " ]
-    "let helpList += [  " Color help               : " ]
-    "let helpList += [  "    hicol [all/color]     : show highlighting color names" ]
-    "let helpList += [  "    hiid  [all/color_id]  : show highlighting color IDs" ]
-    "let helpList += [  " " ]
-    "let helpList += [  " Highlight commands       : " ]
-    "let helpList += [  "    hic PATTERN  COLOR_ID : apply color highlight" ]
-    "let helpList += [  "    hirm                  : remove all highlights" ]
-    "let helpList += [  "    hiu                   : undo last highlight" ]
-    "let helpList += [  "    hish                  : show highlight applied on current file" ]
-    "let helpList += [  "    hishp                 : show highlight patterns" ]
-    "let helpList += [  "    hicrm [COLOR_ID]      : highlight color remove" ]
-    "let helpList += [  "    hics [COLOR_ID]       : highlight color search" ]
-    "let helpList += [  " " ]
-    "let helpList += [  " Folding                  : " ]
-    "let helpList += [  "    hifold [COLOR_ID]     : perform fold, show only lines with highlighting" ]
-    "let helpList += [  "    hifoldsh              : show folding patterns" ]
-    "let helpList += [  " " ]
-    "let helpList += [  " Filter window            : " ]
-    "let helpList += [  "    hif                   : open all lines containing any highlights on a new split" ]
-    "let helpList += [  "    hifs                  : open all lines containing any highlights on a new horizontal split" ]
-    "let helpList += [  "    hifv                  : open all lines containing any highlights on a new vertical split" ]
-    "let helpList += [  "    hift                  : open all lines containing any highlights on a new tab" ]
-    "let helpList += [  "    hifn                  : open all lines containing any highlights on a new buffer" ]
-    "let helpList += [  "    hisy                  : synchronize filter window data and position" ]
-    "let helpList += [  "  Filter position         : " ]
-    "let helpList += [  "    hip                   : synchcronize position" ]
-    "let helpList += [  "    hips                  : synchonize position and switch window" ]
-    "let helpList += [  "    hipsa                 : enable position auto synchonize" ]
-    "let helpList += [  "    hipsn                 : disable position auto synchonize" ]
-    "let helpList += [  "  Filter data             : " ]
-    "let helpList += [  "    hids                  : sychcronize data changes" ]
-    "let helpList += [  "    hidsa                 : enable data change auto synchonize" ]
-    "let helpList += [  "    hidsn                 : disable data changes auto synchonize" ]
-    "let helpList += [  " " ]
-    "let helpList += [  "    Hiup                  : update main and filtered buffer contents" ]
-    "let helpList += [  " " ]
-    "let helpList += [  " Others" ]
-    "let helpList += [  "    hir                   : refresh all highlightings" ]
-    "let helpList += [  " " ]
-
-    "let max = winheight(0) - 1
-    "let n = 0
-    "for helpLine in l:helpList
-        "echo l:helpLine
-        "if l:n >= l:max
-            "" scroll screen
-            "call input("(Press ENTER to continue)")
-            "let n = 0
-        "endif
-        "let n += 1
-    "endfor
-    "call input("")
+    call input("(Press key)")
 endfunction
 
 

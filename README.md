@@ -4,14 +4,18 @@ Highlight text patterns in different colors.
 Save, reload and modify the highlighting configuration.
 Filter by color the lines and show then on a new split/tab.
 
-<img src="https://raw.githubusercontent.com/javipv/HighlightFilter.vim/master/screenshot.png">
+Highlighted text, and menu showing the selected highlights (hish):
+<img src="https://github.com/javipv/HighlightFilter/screenshot0.png">
+
+Show all available color names (hico):
+<img src="https://github.com/javipv/HighlightFilter/screenshot1.png">
+
+Show all available color ID (hiid):
+<img src="https://github.com/javipv/HighlightFilter/screenshot2.png">
 
 ## Install
 
-```
 Pathogen:
-```
-
 ```
 git clone https://github.com/javipv/HighlightFilter.vim.git
 ```
@@ -123,6 +127,11 @@ Highlight show. Show all highlightings done:
 Hihglignt undo. Remove last highlight, will remove the cyan highlight.
 ```
 :hiu
+```
+
+Highlight remove menu. Show some highlightings done:
+```
+:hirm
 ```
 
 Highlight type. Show the saved highlight types:

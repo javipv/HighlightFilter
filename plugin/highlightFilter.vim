@@ -1,9 +1,9 @@
 " Script Name: highlightFilter.vim
- "Description: Highlight patterns in different colors. 
+" Description: Highlight patterns in different colors.
 "   Allows to save, reload and modify the highlighting configuration.
 "   Allows to filter by color the lines and show then on a new split/tab.
 "
-" Copyright:   (C) 2017-2018 Javier Puigdevall Garcia
+" Copyright:   (C) 2017-2019 Javier Puigdevall Garcia
 "   The VIM LICENSE applies to this script; see ':help copyright'.
 "
 " Maintainer:  Javier Garcia Puigdevall <javierpuigdevall@gmail.com>
@@ -11,18 +11,19 @@
 "
 " Dependencies:
 "
-" NOTES:
-
 " INSPIRED BY:
 "   https://github.com/vim-scripts/Mark--Karkat
 "   http://github.com/guns/highlightFilter.vim
 "
-" Version:      1.0.0
+" Version:      1.0.1
 " Changes:
+" 1.0.1 	Tue, 12 Feb 19.     JPuigdevall
+" 1.0.0 	Sun, 10 Feb 17.     JPuigdevall
+"   - Initial realease.
 
 
 if exists('g:loaded_highlightFilter')
-    "finish
+    finish
 endif
 
 if (!has("syntax"))
@@ -129,11 +130,11 @@ command! -nargs=0 HighlightShowPatterns                                         
 
 if !hasmapto('HighlightPattern', 'n')
     " Highlight word
-    nmap <unique> <leader>hw :HighlightPattern \\C<C-R>=escape(expand('<cword>'),' \')<CR> 
-    nmap <unique> <leader>hW :HighlightPattern \\C<C-R>=escape(expand('<cWORD>'),' \')<CR> 
+    nmap <unique> <leader>hw :HighlightPattern \\C<C-R>=escape(expand('<cword>'),' \')<CR>
+    nmap <unique> <leader>hW :HighlightPattern \\C<C-R>=escape(expand('<cWORD>'),' \')<CR>
 
     " Highlight line
-    nmap <unique> <leader>hl :HighlightPattern \\C<C-R>=escape(getline('.'),' \')<CR> 
+    nmap <unique> <leader>hl :HighlightPattern \\C<C-R>=escape(getline('.'),' \')<CR>
     " Highlight line background in red color
     nmap <unique> <leader>h0 :HighlightPattern \\C<C-R>=escape(getline('.'),' \')<CR>  r#<CR>
     " Highlight line background in yellow color
@@ -147,7 +148,7 @@ if !hasmapto('HighlightPattern', 'n')
     " Highlight line background in cyan color
     nmap <unique> <leader>h5 :HighlightPattern \\C<C-R>=escape(getline('.'),' \')<CR>  c#<CR>
 
-    if has("gui_running") 
+    if has("gui_running")
         call highlightFilter#CreateMenus('n' , '' , ":HighlightWord<CR>"      , 'highlight word under cursor'       , s:leader.'hw')
         call highlightFilter#CreateMenus('n' , '' , ':HighlightWholeWord<CR>' , 'highlight whole word under cursor' , s:leader.'hW')
         call highlightFilter#CreateMenus('n' , '' , ':'                       , '-Sep-'                             , '')
@@ -163,7 +164,7 @@ endif
 if !hasmapto('HighlightOpenFilter', 'n')
     nmap <unique> <leader>hf :HighlightOpenFilter<CR>
 
-    if has("gui_running") 
+    if has("gui_running")
         call highlightFilter#CreateMenus('n' , '' , ':'                          , '-Sep2-'                                   , '')
         call highlightFilter#CreateMenus('n' , '' , 'HighlightOpenFilter<CR>'        , 'open filter window'              , s:leader.'hf')
     endif
@@ -173,7 +174,7 @@ if !hasmapto('HighlightSwitchSyncPos', 'n')
     nmap <unique> <leader>hp :HighlightSyncPos<CR>
     nmap <unique> <leader>hP :HighlightSwitchSyncPos<CR>
 
-    if has("gui_running") 
+    if has("gui_running")
         call highlightFilter#CreateMenus('n' , '' , 'HighlightSyncPos<CR>'       , 'synchonize filter position'               , s:leader.'hp')
         call highlightFilter#CreateMenus('n' , '' , 'HighlightSwitchSyncPos<CR>' , 'synchonize filter position switch window' , s:leader.'hP')
     endif
@@ -182,7 +183,7 @@ endif
 if !hasmapto('HighlightSyncData', 'n')
     nmap <unique> <leader>hd :HighlightSyncData<CR>
 
-    if has("gui_running") 
+    if has("gui_running")
         call highlightFilter#CreateMenus('n', '', 'HighlightSyncData<CR>', 'synchonize filter data changes' , s:leader.'hd')
     endif
 endif
@@ -190,7 +191,7 @@ endif
 if !hasmapto('HighlightRefresh', 'n')
     nmap <unique> <leader>hr  :HighlightRefresh<CR>
 
-    if has("gui_running") 
+    if has("gui_running")
         call highlightFilter#CreateMenus('n', '',   ':',          '-Sep3-', '')
         call highlightFilter#CreateMenus('n', '', 'HighlightRefresh<CR>', 'refresh highlighting' , s:leader.'hr')
     endif
@@ -198,9 +199,9 @@ endif
 
 if !hasmapto('HighlightPattern', 'v')
     " Highlight visual selected text:
-    vmap <leader>h  :<BS><BS><BS><BS><BS>HighlightPattern \\C<C-R>=highlightFilter#getVisualSel()<CR>  
+    vmap <leader>h  :<BS><BS><BS><BS><BS>HighlightPattern \\C<C-R>=highlightFilter#getVisualSel()<CR>
 
-    if has("gui_running") 
+    if has("gui_running")
         call highlightFilter#CreateMenus('v' , '', 'HighlightVisual<CR>', 'highlight selection', 'h')
     endif
 endif
