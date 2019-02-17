@@ -5,13 +5,13 @@ Save, reload and modify the highlighting configuration.
 Filter by color the lines and show then on a new split/tab.
 
 Highlighted text, and menu showing the selected highlights (hish):
-<img src="https://github.com/javipv/HighlightFilter/screenshot0.png">
+<img src="https://github.com/javipv/HighlightFilter/blob/master/screenshot0.png">
 
 Show all available color names (hico):
-<img src="https://github.com/javipv/HighlightFilter/screenshot1.png">
+<img src="https://github.com/javipv/HighlightFilter/blob/master/screenshot1.png">
 
 Show all available color ID (hiid):
-<img src="https://github.com/javipv/HighlightFilter/screenshot2.png">
+<img src="https://github.com/javipv/HighlightFilter/blob/master/screenshot2.png">
 
 ## Install
 
